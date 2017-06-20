@@ -14,15 +14,24 @@
 
 <body>
 
-<div class="container">
-    <h1>My Dashboard</h1>
-    <div class="row">
-        <ul class="nav nav-pills">
-            <li role="presentation"><a href="index.html">Home</a></li>
-            <li role="presentation"><a href="geochart.html">Geochart POC</a></li>
-            <li role="presentation" class="active"><a href="#">Multidime POC</a></li>
-        </ul>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">
+                <img alt="" src="">
+            </a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li role="presentation" class="active"><a href="#">Home</a></li>
+                <li role="presentation"><a href="geochart.html">Geochart POC</a></li>
+                <li role="presentation"><a href="multidim.html">Multidime POC</a></li>
+            </ul>
+        </div>
     </div>
+</nav>
+
+<div class="container">
     <script type="text/javascript" src="header.js"></script>
     <h3>Vintage</h3>
     <div id="chart-ring-year" style="width:300px; height:300px">
