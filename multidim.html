@@ -32,7 +32,6 @@
 </nav>
 
 <div class="container">
-    <script type="text/javascript" src="header.js"></script>
     <h3>Vintage</h3>
     <div id="chart-ring-year" style="width:300px; height:300px">
         <div class="reset" style="visibility: hidden;">selected: <span class="filter"></span>
@@ -51,10 +50,27 @@
         </div>
     </div>
 
+
+    <div class="clearfix"></div>
+    <div class="row">
+        <div>
+            <br/>
+            <div class="dc-data-count">
+                <span class="filter-count"></span> selected out of <span class="total-count"></span> records | <a
+                    href="javascript:dc.filterAll(); dc.redrawAll();">Reset All</a>
+            </div>
+        </div>
+        <table class="table table-hover dc-data-table">
+        </table>
+    </div>
+
     <script type="text/javascript">
         var yearRingChart   = dc.pieChart("#chart-ring-year"),
             spendHistChart  = dc.barChart("#chart-hist-spend"),
-            spenderRowChart = dc.rowChart("#chart-row-spenders");
+            spenderRowChart = dc.rowChart("#chart-row-spenders"),
+            dataCount       = dc.dataCount('.dc-data-count'),
+            tableListing    = dc.dataTable('.dc-data-table');
+
         // use static or load via d3.csv("spendData.csv", function(error, spendData) {/* do stuff */});
         var spendData = [
             {Name: 'FHAVA', Spent: '1,196,235.00', Year: 2008},
@@ -83,6 +99,7 @@
             .dimension(yearDim)
             .group(spendPerYear)
             .innerRadius(50)
+            .colors(d3.scale.category10())
             .controlsUseVisibility(true);
         spendHistChart
             .dimension(spendDim)
@@ -96,6 +113,7 @@
             .dimension(nameDim)
             .group(spendPerName)
             .elasticX(true)
+            .ordinalColors(["#d95f02","#1b9e77","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d"])
             .controlsUseVisibility(true);
         function show_empty_message(chart) {
             var is_empty = d3.sum(chart.group().all().map(chart.valueAccessor())) === 0;
@@ -116,7 +134,59 @@
         }
         spendHistChart.on('pretransition', show_empty_message);
         spenderRowChart.on('pretransition', show_empty_message);
+
+        // data count
+        var all = ndx.groupAll();
+        dataCount
+            .dimension(ndx)
+            .group(all)
+            // (_optional_) `.html` sets different html when some records or all records are selected.
+            // `.html` replaces everything in the anchor with the html given using the following function.
+            // `%filter-count` and `%total-count` are replaced with the values obtained.
+            .html({
+                some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
+                ' | <a href=\'javascript:dc.filterAll(); dc.redrawAll();\'>Reset All</a>',
+                all: 'All records selected. Please click on the graph to apply filters.'
+            });
+
+        // build table listing
+        var tableData = ndx.dimension(function(d) {return d.Name;});
+
+        tableListing
+            .dimension(tableData)
+            // Data table does not use crossfilter group but rather a closure
+            // as a grouping function
+            .group(function(d) { return 'Name' })
+            .showGroups(false)
+            // (_optional_) max number of records to be shown, `default = 25`
+            .size(10)
+            // There are several ways to specify the columns; see the data-table documentation.
+            // This code demonstrates generating the column header automatically based on the columns.
+            .columns([
+                // Use the `d.date` field; capitalized automatically
+                {
+                    label: "Name",
+                    format: function (d) { return d.Name; }
+                },
+                {
+                    label: "Spent",
+                    format: function (d) { return d.Spent; }
+                },
+                {
+                    label: "Year",
+                    format: function (d) { return d.Year; }
+                }
+            ])
+
+            // (_optional_) sort using the given field, `default = function(d){return d;}`
+            .sortBy(function (d) {
+                return d.Name;
+            })
+            // (_optional_) sort order, `default = d3.ascending`
+            .order(d3.ascending);
+
         dc.renderAll();
+
     </script>
 
 </div>
